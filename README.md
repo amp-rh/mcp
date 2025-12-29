@@ -1,6 +1,13 @@
 # MCP Router
 
+[![Install](https://img.shields.io/badge/pip-install%20from%20github-blue)](https://github.com/amp-rh/mcp)
+[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Tests](https://img.shields.io/badge/tests-50%20passing-brightgreen.svg)](#testing)
+[![FastMCP](https://img.shields.io/badge/FastMCP-compatible-purple)](https://gofastmcp.com)
+
 A production-ready MCP router that aggregates and routes requests to multiple MCP backend servers. Built with FastMCP and featuring advanced routing strategies, health checking, and circuit breaker patterns.
+
+**Quick Install:** `pip install git+https://github.com/amp-rh/mcp.git`
 
 ## Features
 
@@ -21,13 +28,39 @@ A production-ready MCP router that aggregates and routes requests to multiple MC
 
 ## Quick Start
 
+### For Claude Desktop Users
+
+1. **Add to Claude Desktop configuration:**
+
+```json
+{
+  "mcpServers": {
+    "mcp-router": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--with",
+        "git+https://github.com/amp-rh/mcp.git",
+        "mcp-router"
+      ]
+    }
+  }
+}
+```
+
+2. **Restart Claude Desktop**
+
+3. **Done!** The router tools are now available in Claude Desktop
+
+### For Local Development
+
 ```bash
 # Install uv if not already installed
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone and setup
-git clone <this-repo>
-cd mcp-router
+git clone https://github.com/amp-rh/mcp.git
+cd mcp
 uv sync --all-extras
 
 # Copy example configuration
@@ -42,7 +75,168 @@ make run
 
 The router will be available at `http://localhost:8000` and expose all backend tools with namespace prefixes.
 
-## Configuration
+## Installation
+
+### Method 1: Install from GitHub (Recommended)
+
+```bash
+pip install git+https://github.com/amp-rh/mcp.git
+```
+
+After installation, you can run:
+```bash
+# Template mode (simple MCP server)
+mcp-server
+
+# Router mode (multi-backend aggregation)
+mcp-router
+```
+
+### Method 2: Install with uv
+
+```bash
+uv pip install git+https://github.com/amp-rh/mcp.git
+```
+
+### Method 3: Development Installation
+
+```bash
+git clone https://github.com/amp-rh/mcp.git
+cd mcp
+uv sync --all-extras
+```
+
+## Claude Desktop Integration
+
+To use this MCP router with Claude Desktop, add to your MCP settings:
+
+### Option 1: Using uv (Recommended)
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%/Claude/claude_desktop_config.json` (Windows):
+
+```json
+{
+  "mcpServers": {
+    "mcp-router": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--with",
+        "git+https://github.com/amp-rh/mcp.git",
+        "mcp-router"
+      ],
+      "env": {
+        "MCP_BACKENDS_CONFIG": "/path/to/your/config/backends.yaml"
+      }
+    }
+  }
+}
+```
+
+### Option 2: Using Installed Package
+
+If you've installed via pip:
+
+```json
+{
+  "mcpServers": {
+    "mcp-router": {
+      "command": "mcp-router",
+      "env": {
+        "MCP_BACKENDS_CONFIG": "/path/to/your/config/backends.yaml"
+      }
+    }
+  }
+}
+```
+
+### Option 3: Using FastMCP CLI
+
+```bash
+# Install the router
+pip install git+https://github.com/amp-rh/mcp.git
+
+# Configure for Claude Desktop
+fastmcp install claude-desktop mcp_server.server:mcp --name mcp-router
+```
+
+### Option 4: Template Mode (No Routing)
+
+For simple template mode without routing:
+
+```json
+{
+  "mcpServers": {
+    "mcp-template": {
+      "command": "mcp-server"
+    }
+  }
+}
+```
+
+**Note:** After updating configuration, restart Claude Desktop for changes to take effect.
+
+## Configuration for Claude Desktop
+
+### Step 1: Create Backend Configuration
+
+Create or edit `config/backends.yaml`:
+
+```yaml
+backends:
+  - name: my-backend
+    url: http://localhost:8001
+    namespace: backend
+    priority: 10
+    routes:
+      - pattern: "*"
+        strategy: capability
+    health_check:
+      enabled: true
+      interval_seconds: 30
+    circuit_breaker:
+      failure_threshold: 5
+      timeout_seconds: 60
+```
+
+### Step 2: Set Environment Variable
+
+Point Claude Desktop to your config file:
+
+```json
+{
+  "mcpServers": {
+    "mcp-router": {
+      "command": "mcp-router",
+      "env": {
+        "MCP_BACKENDS_CONFIG": "/absolute/path/to/config/backends.yaml"
+      }
+    }
+  }
+}
+```
+
+### Step 3: Restart Claude Desktop
+
+Restart Claude Desktop to load the MCP server.
+
+### Troubleshooting
+
+**Server not appearing:**
+- Check Claude Desktop logs at `~/Library/Logs/Claude/mcp*.log` (macOS)
+- Verify backend config file path is absolute
+- Ensure backend MCP servers are running
+
+**Connection errors:**
+- Verify backend URLs are correct
+- Check backend servers are accessible
+- Review health check settings in config
+
+**Tool conflicts:**
+- Enable namespace prefixing to avoid naming conflicts
+- Use unique namespaces for each backend
+
+## Routing Configuration
 
 ### Step 1: Create Backend Configuration
 

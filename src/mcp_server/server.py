@@ -382,6 +382,17 @@ def main() -> None:
     mcp.run()
 
 
+def main_router() -> None:
+    """Entry point for router server mode."""
+    asyncio.run(_run_router())
+
+
+async def _run_router() -> None:
+    """Run the router server."""
+    router = await create_router_server()
+    await router.run()
+
+
 if __name__ == "__main__":
     main()
 
