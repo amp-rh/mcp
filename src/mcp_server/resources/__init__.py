@@ -8,4 +8,3 @@ def register_resources(mcp: FastMCP) -> None:
 
 
 __all__ = ["register_resources"]
-

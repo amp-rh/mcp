@@ -35,4 +35,3 @@ def register_example_resources(mcp: FastMCP) -> None:
                 "description": f"This is item {item_id}",
             }
         )
-

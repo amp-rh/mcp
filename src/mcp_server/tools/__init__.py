@@ -8,4 +8,3 @@ def register_tools(mcp: FastMCP) -> None:
 
 
 __all__ = ["register_tools"]
-

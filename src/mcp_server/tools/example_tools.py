@@ -16,4 +16,3 @@ def register_example_tools(mcp: FastMCP) -> None:
     def reverse_string(text: str) -> str:
         """Reverse the given text string."""
         return text[::-1]
-

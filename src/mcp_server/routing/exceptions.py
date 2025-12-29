@@ -24,9 +24,7 @@ class RouterError(Exception):
             "message": self.message,
             "backend": self.backend,
             "routing_decision": self.routing_decision,
-            "original_error": str(self.original_error)
-            if self.original_error
-            else None,
+            "original_error": str(self.original_error) if self.original_error else None,
         }
 
 

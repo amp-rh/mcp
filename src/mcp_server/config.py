@@ -62,19 +62,13 @@ class RouterConfig:
             enable_namespace_prefixing=os.getenv(
                 "MCP_ENABLE_NAMESPACES",
                 "true",
-            ).lower() == "true",
+            ).lower()
+            == "true",
             capability_cache_ttl=int(os.getenv("MCP_CACHE_TTL", "300")),
             request_timeout=int(os.getenv("MCP_REQUEST_TIMEOUT", "30")),
-            health_check_interval=int(
-                os.getenv("MCP_HEALTH_CHECK_INTERVAL", "30")
-            ),
-            health_check_timeout=int(
-                os.getenv("MCP_HEALTH_CHECK_TIMEOUT", "5")
-            ),
+            health_check_interval=int(os.getenv("MCP_HEALTH_CHECK_INTERVAL", "30")),
+            health_check_timeout=int(os.getenv("MCP_HEALTH_CHECK_TIMEOUT", "5")),
             max_retry_attempts=int(os.getenv("MCP_MAX_RETRIES", "3")),
-            retry_backoff_multiplier=float(
-                os.getenv("MCP_RETRY_BACKOFF", "2.0")
-            ),
+            retry_backoff_multiplier=float(os.getenv("MCP_RETRY_BACKOFF", "2.0")),
             max_retry_backoff=int(os.getenv("MCP_MAX_BACKOFF", "10")),
         )
-

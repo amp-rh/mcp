@@ -60,9 +60,7 @@ class HealthChecker:
             try:
                 await asyncio.sleep(self.check_interval)
 
-                for _backend_name, backend in (
-                    self.backend_manager.backends.items()
-                ):
+                for _backend_name, backend in self.backend_manager.backends.items():
                     if not backend.config.health_check.enabled:
                         continue
 
@@ -112,9 +110,7 @@ class HealthChecker:
         # Transition HALF_OPEN -> CLOSED on success
         if self.circuit_states.get(backend_name) == "HALF_OPEN":
             self.circuit_states[backend_name] = "CLOSED"
-            logger.info(
-                f"Circuit breaker for {backend_name} closed (recovered)"
-            )
+            logger.info(f"Circuit breaker for {backend_name} closed (recovered)")
 
     def record_failure(self, backend_name: str, error: Exception) -> None:
         """Record failed request to backend.
@@ -186,8 +182,7 @@ class HealthChecker:
                 # Attempt recovery
                 self.circuit_states[backend_name] = "HALF_OPEN"
                 logger.info(
-                    f"Circuit breaker for {backend_name} "
-                    f"transitioned to HALF_OPEN"
+                    f"Circuit breaker for {backend_name} transitioned to HALF_OPEN"
                 )
                 return True
 
@@ -237,17 +232,13 @@ class HealthChecker:
         if not backend:
             return HealthStatus(backend_name=backend_name)
 
-        backend.health_status.error_count = self.error_counts.get(
-            backend_name, 0
-        )
+        backend.health_status.error_count = self.error_counts.get(backend_name, 0)
         backend.health_status.circuit_state = self.circuit_states.get(
             backend_name, "CLOSED"
         )
         backend.health_status.last_check = self.last_check_times.get(
             backend_name, datetime.now()
         )
-        backend.health_status.is_healthy = not self.is_circuit_open(
-            backend_name
-        )
+        backend.health_status.is_healthy = not self.is_circuit_open(backend_name)
 
         return backend.health_status

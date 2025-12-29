@@ -93,4 +93,3 @@ class TestExplainConceptPrompt:
         assert explain_concept is not None
         result = explain_concept(concept="APIs", audience="expert")
         assert "expert" in result
-

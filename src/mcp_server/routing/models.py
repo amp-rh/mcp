@@ -43,9 +43,7 @@ class BackendConfig:
     priority: int = 10  # Higher priority backends tried first
     routes: list[RouteConfig] = field(default_factory=list)
     health_check: HealthCheckConfig = field(default_factory=HealthCheckConfig)
-    circuit_breaker: CircuitBreakerConfig = field(
-        default_factory=CircuitBreakerConfig
-    )
+    circuit_breaker: CircuitBreakerConfig = field(default_factory=CircuitBreakerConfig)
 
 
 @dataclass

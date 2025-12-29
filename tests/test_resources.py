@@ -75,4 +75,3 @@ class TestItemResource:
         assert data["id"] == "123"
         assert "name" in data
         assert "description" in data
-

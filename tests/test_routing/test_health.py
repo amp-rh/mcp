@@ -153,9 +153,7 @@ class TestHealthChecker:
         checker = HealthChecker()
         # Initialize state with expired timeout
         checker.circuit_states["test-backend"] = "OPEN"
-        checker.circuit_timeouts["test-backend"] = datetime.now() - timedelta(
-            seconds=1
-        )
+        checker.circuit_timeouts["test-backend"] = datetime.now() - timedelta(seconds=1)
 
         # Call is_circuit_open which should trigger transition
         is_open = checker.is_circuit_open("test-backend")

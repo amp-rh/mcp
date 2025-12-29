@@ -197,9 +197,7 @@ class RoutingEngine:
 
         # Try backends in priority order, skipping unhealthy ones
         for backend in backends:
-            logger.debug(
-                f"Trying fallback backend: {backend.config.name}"
-            )
+            logger.debug(f"Trying fallback backend: {backend.config.name}")
             # Fallback routing doesn't check if tool exists, tries backend
             return RoutingDecision(
                 backend=backend,
@@ -263,9 +261,7 @@ class RoutingEngine:
 
             except Exception as e:
                 last_error = e
-                logger.debug(
-                    f"Error on attempt {attempt + 1}: {e}"
-                )
+                logger.debug(f"Error on attempt {attempt + 1}: {e}")
 
                 if attempt < self.max_retry_attempts - 1:
                     sleep_time = min(backoff_time, self.max_retry_backoff)

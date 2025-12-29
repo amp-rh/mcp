@@ -91,4 +91,3 @@ class TestReverseStringTool:
         assert reverse_string is not None
         result = reverse_string(text="")
         assert result == ""
-

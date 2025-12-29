@@ -97,9 +97,7 @@ backends:
 """)
             f.flush()
 
-            with pytest.raises(
-                ConfigurationError, match="non-negative integer"
-            ):
+            with pytest.raises(ConfigurationError, match="non-negative integer"):
                 load_backends_config(f.name)
 
     def test_config_invalid_yaml(self):

@@ -1,6 +1,5 @@
 """Tests for data models."""
 
-
 from mcp_server.routing.models import (
     BackendConfig,
     CircuitBreakerConfig,

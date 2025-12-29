@@ -8,4 +8,3 @@ def register_prompts(mcp: FastMCP) -> None:
 
 
 __all__ = ["register_prompts"]
-

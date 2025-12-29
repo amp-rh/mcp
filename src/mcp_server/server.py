@@ -136,21 +136,17 @@ async def register_proxied_tools(
 
             # Apply namespace prefixing
             if enable_namespace_prefixing:
-                proxied_name = (
-                    f"{backend.config.namespace}.{original_name}"
-                )
+                proxied_name = f"{backend.config.namespace}.{original_name}"
             else:
                 proxied_name = original_name
 
             # Create proxy function
-            def make_proxy(
-                backend_ref: Backend, tool_name: str, display_name: str
-            ):
+            def make_proxy(backend_ref: Backend, tool_name: str, display_name: str):
                 async def proxy_tool(**kwargs: Any) -> Any:
                     try:
                         # Find appropriate route config for this tool
-                        matching_backends = (
-                            backend_manager.get_backends_for_tool(tool_name)
+                        matching_backends = backend_manager.get_backends_for_tool(
+                            tool_name
                         )
                         if not matching_backends:
                             matching_backends = [backend_ref]
@@ -231,16 +227,12 @@ async def register_proxied_resources(
 
             # Apply namespace prefixing
             if enable_namespace_prefixing:
-                proxied_uri = (
-                    f"{backend.config.namespace}://{original_uri}"
-                )
+                proxied_uri = f"{backend.config.namespace}://{original_uri}"
             else:
                 proxied_uri = original_uri
 
             # Create proxy function
-            def make_resource_proxy(
-                backend_ref: Backend, uri: str, display_uri: str
-            ):
+            def make_resource_proxy(backend_ref: Backend, uri: str, display_uri: str):
                 async def proxy_resource() -> str:
                     try:
                         result = await routing_engine.call_with_retry(
@@ -308,9 +300,7 @@ async def register_proxied_prompts(
 
             # Apply namespace prefixing
             if enable_namespace_prefixing:
-                proxied_name = (
-                    f"{backend.config.namespace}.{original_name}"
-                )
+                proxied_name = f"{backend.config.namespace}.{original_name}"
             else:
                 proxied_name = original_name
 
@@ -362,9 +352,7 @@ def register_router_tools(
         Returns:
             Dictionary with health status details
         """
-        status = backend_manager.health_checker.get_health_status(
-            backend_name
-        )
+        status = backend_manager.health_checker.get_health_status(backend_name)
         return {
             "name": backend_name,
             "healthy": status.is_healthy,
@@ -398,4 +386,3 @@ async def _run_router() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -21,4 +21,3 @@ try:
 except ImportError:
     # FastMCP not available in test environment, skip fixtures
     pass
-
