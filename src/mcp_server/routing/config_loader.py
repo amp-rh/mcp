@@ -53,7 +53,12 @@ def load_backends_config(config_path: str) -> list[BackendConfig]:
             ) from e
 
     if not backends:
-        raise ConfigurationError("At least one backend must be configured")
+        raise ConfigurationError(
+            "At least one backend must be configured.\n"
+            "Please edit config/backends.yaml and add backend servers.\n"
+            "See config/backends.yaml.example for examples.\n"
+            "For a simple MCP server without routing, use 'mcp-server' instead of 'mcp-router'."
+        )
 
     return backends
 
