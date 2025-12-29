@@ -13,7 +13,7 @@ class MockBackend:
     def __init__(self, name, tools=None):
         self.config = BackendConfig(
             name=name,
-            url=f"http://localhost:8001",
+            url="http://localhost:8001",
             namespace=name,
         )
         self.tools = tools or []

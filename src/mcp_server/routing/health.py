@@ -60,7 +60,7 @@ class HealthChecker:
             try:
                 await asyncio.sleep(self.check_interval)
 
-                for backend_name, backend in (
+                for _backend_name, backend in (
                     self.backend_manager.backends.items()
                 ):
                     if not backend.config.health_check.enabled:

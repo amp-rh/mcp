@@ -3,11 +3,11 @@
 import asyncio
 import fnmatch
 import logging
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from mcp_server.routing.exceptions import (
     BackendTimeoutError,
-    BackendUnavailableError,
     RoutingError,
 )
 from mcp_server.routing.models import RoutingDecision
@@ -248,7 +248,7 @@ class RoutingEngine:
                     logger.debug(f"Succeeded on retry {attempt}")
                 return result
 
-            except asyncio.TimeoutError as e:
+            except TimeoutError as e:
                 last_error = BackendTimeoutError(
                     f"Request timed out on attempt {attempt + 1}",
                     original_error=e,

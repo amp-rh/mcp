@@ -128,7 +128,7 @@ async def register_proxied_tools(
     """
     tool_count = 0
 
-    for backend_name, backend in backend_manager.backends.items():
+    for _backend_name, backend in backend_manager.backends.items():
         for tool_info in backend.tools:
             original_name = tool_info.get("name")
             if not original_name:
@@ -143,7 +143,9 @@ async def register_proxied_tools(
                 proxied_name = original_name
 
             # Create proxy function
-            def make_proxy(backend_ref: Backend, tool_name: str):
+            def make_proxy(
+                backend_ref: Backend, tool_name: str, display_name: str
+            ):
                 async def proxy_tool(**kwargs: Any) -> Any:
                     try:
                         # Find appropriate route config for this tool
@@ -182,14 +184,14 @@ async def register_proxied_tools(
                             e,
                         )
                         raise RouterError(
-                            f"Failed to call {proxied_name}: {e}",
+                            f"Failed to call {display_name}: {e}",
                             backend=backend_ref.config.name,
                             original_error=e,
                         ) from e
 
                 return proxy_tool
 
-            proxy_fn = make_proxy(backend, original_name)
+            proxy_fn = make_proxy(backend, original_name, proxied_name)
             proxy_fn.__name__ = proxied_name.replace(".", "_")
             description = tool_info.get("description", "")
 
@@ -221,7 +223,7 @@ async def register_proxied_resources(
     """
     resource_count = 0
 
-    for backend_name, backend in backend_manager.backends.items():
+    for _backend_name, backend in backend_manager.backends.items():
         for resource_info in backend.resources:
             original_uri = resource_info.get("uri")
             if not original_uri:
@@ -236,7 +238,9 @@ async def register_proxied_resources(
                 proxied_uri = original_uri
 
             # Create proxy function
-            def make_resource_proxy(backend_ref: Backend, uri: str):
+            def make_resource_proxy(
+                backend_ref: Backend, uri: str, display_uri: str
+            ):
                 async def proxy_resource() -> str:
                     try:
                         result = await routing_engine.call_with_retry(
@@ -258,14 +262,14 @@ async def register_proxied_resources(
                             e,
                         )
                         raise RouterError(
-                            f"Failed to get resource {proxied_uri}: {e}",
+                            f"Failed to get resource {display_uri}: {e}",
                             backend=backend_ref.config.name,
                             original_error=e,
                         ) from e
 
                 return proxy_resource
 
-            proxy_fn = make_resource_proxy(backend, original_uri)
+            proxy_fn = make_resource_proxy(backend, original_uri, proxied_uri)
             description = resource_info.get("description", "")
 
             # Register with FastMCP
@@ -296,7 +300,7 @@ async def register_proxied_prompts(
     """
     prompt_count = 0
 
-    for backend_name, backend in backend_manager.backends.items():
+    for _backend_name, backend in backend_manager.backends.items():
         for prompt_info in backend.prompts:
             original_name = prompt_info.get("name")
             if not original_name:
@@ -311,7 +315,6 @@ async def register_proxied_prompts(
                 proxied_name = original_name
 
             # Create proxy function - for now just log
-            description = prompt_info.get("description", "")
             logger.debug(f"Registered proxied prompt: {proxied_name}")
             prompt_count += 1
 

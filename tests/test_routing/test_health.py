@@ -1,13 +1,9 @@
 """Tests for health checking and circuit breaker."""
 
-import asyncio
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock
-
-import pytest
+from unittest.mock import MagicMock
 
 from mcp_server.routing.health import HealthChecker
-from mcp_server.routing.models import BackendConfig
 
 
 class TestHealthChecker:

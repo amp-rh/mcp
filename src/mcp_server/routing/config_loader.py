@@ -47,8 +47,9 @@ def load_backends_config(config_path: str) -> list[BackendConfig]:
             backend = _parse_backend_config(backend_data)
             backends.append(backend)
         except (KeyError, ValueError, TypeError) as e:
+            backend_name = backend_data.get("name", "unknown")
             raise ConfigurationError(
-                f"Invalid backend config for '{backend_data.get('name', 'unknown')}': {e}"
+                f"Invalid backend config for '{backend_name}': {e}"
             ) from e
 
     if not backends:

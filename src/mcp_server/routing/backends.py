@@ -3,7 +3,6 @@
 import logging
 from datetime import datetime, timedelta
 
-from mcp_server.routing.exceptions import CapabilityDiscoveryError
 from mcp_server.routing.models import BackendConfig, HealthStatus
 
 logger = logging.getLogger(__name__)
