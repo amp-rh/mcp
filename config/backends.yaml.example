@@ -1,0 +1,82 @@
+# Example MCP Router backend configuration
+# Copy this to config/backends.yaml and customize for your setup
+
+backends:
+  # Database backend example
+  - name: db
+    url: http://localhost:8001
+    namespace: db
+    priority: 10
+    routes:
+      - pattern: "*_user"
+        strategy: path
+      - pattern: "query*"
+        strategy: path
+    health_check:
+      enabled: true
+      interval_seconds: 30
+      timeout_seconds: 5
+    circuit_breaker:
+      failure_threshold: 5
+      timeout_seconds: 60
+      half_open_attempts: 3
+
+  # API backend example
+  - name: api
+    url: http://localhost:8002
+    namespace: api
+    priority: 20
+    routes:
+      - pattern: "fetch_*"
+        strategy: capability
+      - pattern: "get_*"
+        strategy: capability
+    health_check:
+      enabled: true
+      interval_seconds: 30
+      timeout_seconds: 5
+    circuit_breaker:
+      failure_threshold: 3
+      timeout_seconds: 30
+      half_open_attempts: 2
+
+  # Analytics backend with fallback example
+  - name: analytics-primary
+    url: http://localhost:8003
+    namespace: analytics
+    priority: 10
+    routes:
+      - pattern: "analyze_*"
+        strategy: fallback
+        fallback_to: analytics-secondary
+    health_check:
+      enabled: true
+      interval_seconds: 30
+    circuit_breaker:
+      failure_threshold: 5
+      timeout_seconds: 60
+
+  - name: analytics-secondary
+    url: http://localhost:8004
+    namespace: analytics
+    priority: 20
+    routes:
+      - pattern: "analyze_*"
+        strategy: path
+    health_check:
+      enabled: true
+      interval_seconds: 30
+    circuit_breaker:
+      failure_threshold: 5
+      timeout_seconds: 60
+
+# Global router settings
+routing:
+  default_strategy: capability
+  enable_namespace_prefixing: true
+  capability_cache_ttl_seconds: 300
+  request_timeout_seconds: 30
+  retry:
+    max_attempts: 3
+    backoff_multiplier: 2
+    max_backoff_seconds: 10
