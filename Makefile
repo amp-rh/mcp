@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format check build run run-container clean
+.PHONY: help install dev test lint format check build run run-container clean install-claude uninstall-claude
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -39,4 +39,10 @@ run-container: ## Run container
 clean: ## Clean up build artifacts
 	rm -rf .pytest_cache .coverage htmlcov dist build *.egg-info
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+
+install-claude: install ## Install MCP server to Claude Code
+	./install-to-claude.sh
+
+uninstall-claude: ## Uninstall MCP server from Claude Code
+	./uninstall-from-claude.sh
 

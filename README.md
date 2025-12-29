@@ -28,6 +28,36 @@ A production-ready MCP router that aggregates and routes requests to multiple MC
 
 ## Quick Start
 
+### For Claude Code Users
+
+**🚀 Install directly from GitHub (no clone needed):**
+
+```bash
+claude mcp add --transport stdio mcp-server \
+  -- uv run --with "git+https://github.com/amp-rh/mcp.git" mcp-server
+```
+
+**Or clone for local development:**
+
+```bash
+git clone https://github.com/amp-rh/mcp.git && cd mcp && ./install-to-claude.sh
+```
+
+**Verify and use:**
+
+```bash
+# Check installation
+claude mcp list
+
+# In Claude Code, test the tools
+/mcp
+```
+
+**Next steps:**
+- Type `/mcp` in Claude Code to see available tools
+- For customization, clone the repo and edit `src/mcp_server/tools/`
+- See [CLAUDE_CODE_SETUP.md](CLAUDE_CODE_SETUP.md) for detailed installation options
+
 ### For Claude Desktop Users
 
 1. **Add to Claude Desktop configuration:**

@@ -2,21 +2,22 @@
 # This is a template configuration file. Copy backends.yaml.example for a complete example
 # with multiple backends and routing strategies.
 
-backends:
-  # Example backend - replace with your actual MCP servers
-  - name: example-backend
-    url: http://localhost:8001
-    namespace: example
-    priority: 10
-    routes:
-      - pattern: "*"
-        strategy: capability
-    health_check:
-      enabled: true
-      interval_seconds: 30
-    circuit_breaker:
-      failure_threshold: 5
-      timeout_seconds: 60
+backends: []
+  # Add your MCP backend servers here
+  # Example configuration (commented out):
+  # - name: example-backend
+  #   url: http://localhost:8001
+  #   namespace: example
+  #   priority: 10
+  #   routes:
+  #     - pattern: "*"
+  #       strategy: capability
+  #   health_check:
+  #     enabled: true
+  #     interval_seconds: 30
+  #   circuit_breaker:
+  #     failure_threshold: 5
+  #     timeout_seconds: 60
 
 # Global router settings
 routing:
