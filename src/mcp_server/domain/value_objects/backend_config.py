@@ -1,5 +1,10 @@
 from dataclasses import dataclass
 
+from mcp_server.domain.value_objects.backend_source import (
+    BackendSource,
+    BackendSourceType,
+)
+
 
 @dataclass(frozen=True)
 class RoutePattern:
@@ -46,18 +51,25 @@ class CircuitBreakerSettings:
 @dataclass(frozen=True)
 class BackendConfig:
     name: str
-    url: str
+    source: BackendSource
     namespace: str
     priority: int = 10
     routes: tuple[RoutePattern, ...] = ()
     health_check: HealthCheckSettings = HealthCheckSettings()
     circuit_breaker: CircuitBreakerSettings = CircuitBreakerSettings()
+    auto_start: bool = True
+
+    @property
+    def url(self) -> str:
+        if self.source.http_url:
+            return self.source.http_url
+        if self.source.process_config and self.source.process_config.port:
+            return f"http://localhost:{self.source.process_config.port}"
+        raise ValueError(f"Backend {self.name} has no accessible URL")
 
     def __post_init__(self) -> None:
         if not self.name:
             raise ValueError("Backend name cannot be empty")
-        if not self.url:
-            raise ValueError("Backend URL cannot be empty")
         if not self.namespace:
             raise ValueError("Backend namespace cannot be empty")
         if self.priority < 0:

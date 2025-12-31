@@ -16,6 +16,7 @@ class Backend:
     tools: list[dict[str, Any]] = field(default_factory=list)
     resources: list[dict[str, Any]] = field(default_factory=list)
     prompts: list[dict[str, Any]] = field(default_factory=list)
+    process_id: int | None = None
 
     def __post_init__(self) -> None:
         self.health_status = HealthStatus(backend_name=self.config.name)
@@ -31,6 +32,14 @@ class Backend:
     @property
     def is_circuit_open(self) -> bool:
         return self.health_status.circuit_state == CircuitState.OPEN
+
+    @property
+    def is_managed_process(self) -> bool:
+        return self.config.source.process_config is not None
+
+    @property
+    def is_running(self) -> bool:
+        return self.process_id is not None
 
     def has_tool(self, tool_name: str) -> bool:
         return any(t.get("name") == tool_name for t in self.tools)

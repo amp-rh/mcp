@@ -1,4 +1,5 @@
 from mcp_server.application.ports import MCPClientPort
+from mcp_server.domain.entities import Backend
 from mcp_server.domain.repositories import BackendRepository
 
 
@@ -29,3 +30,14 @@ class DiscoverCapabilities:
 
             except Exception as e:
                 backend.record_failure(str(e))
+
+    async def execute_for_backend(self, backend: Backend, client: MCPClientPort) -> None:
+        try:
+            tools = await client.list_tools()
+            resources = await client.list_resources()
+            prompts = await client.list_prompts()
+
+            backend.update_capabilities(tools, resources, prompts)
+            backend.record_success()
+        except Exception as e:
+            backend.record_failure(str(e))

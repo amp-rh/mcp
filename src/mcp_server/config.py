@@ -26,7 +26,7 @@ class RouterConfig:
     name: str = "mcp-router"
     host: str = "0.0.0.0"
     port: int = 8000
-    backends_config_path: str = "config/backends.yaml"
+    backends_config_path: str = "~/.mcp/config.yaml"
     # Routing settings
     default_routing_strategy: str = "capability"
     enable_namespace_prefixing: bool = True
@@ -53,7 +53,7 @@ class RouterConfig:
             port=int(os.getenv("MCP_PORT", "8000")),
             backends_config_path=os.getenv(
                 "MCP_BACKENDS_CONFIG",
-                "config/backends.yaml",
+                "~/.mcp/config.yaml",
             ),
             default_routing_strategy=os.getenv(
                 "MCP_DEFAULT_STRATEGY",

@@ -37,6 +37,9 @@ async def create_router_server(config: RouterConfig | None = None) -> FastMCP:
         max_retry_backoff=config.max_retry_backoff,
     )
 
+    logger.info("Initializing backends...")
+    await composition_root.initialize_backends()
+
     logger.info("Discovering backend capabilities...")
     await composition_root.discover_capabilities.execute()
 
@@ -66,6 +69,12 @@ async def create_router_server(config: RouterConfig | None = None) -> FastMCP:
             config.health_check_interval,
         )
     )
+
+    asyncio.create_task(_run_process_monitor(composition_root, interval=30))
+
+    await composition_root.config_watcher.start()
+
+    _register_shutdown_handler(composition_root)
 
     logger.info("Router server initialization complete")
 
@@ -203,6 +212,8 @@ def _register_router_tools(
                 "healthy": backend.is_healthy,
                 "circuit_state": backend.health_status.circuit_state.value,
                 "error_count": backend.health_status.error_count,
+                "is_managed": backend.is_managed_process,
+                "is_running": backend.is_running,
             }
             for backend in backends
         ]
@@ -221,6 +232,70 @@ def _register_router_tools(
             "last_error": backend.health_status.last_error,
         }
 
+    @server.tool
+    async def register_backend(
+        source: str,
+        name: str | None = None,
+        namespace: str | None = None,
+        priority: int = 10,
+        auto_start: bool = True,
+    ) -> dict[str, Any]:
+        """
+        Register a new MCP backend server.
+
+        Args:
+            source: Backend source - HTTP URL, github:owner/repo, or package name
+            name: Backend name (auto-generated if not provided)
+            namespace: Namespace for tools/resources (auto-generated if not provided)
+            priority: Routing priority (default: 10)
+            auto_start: Auto-start managed processes (default: True)
+
+        Examples:
+            - HTTP: "http://localhost:8001"
+            - GitHub: "github:modelcontextprotocol/server-sqlite"
+            - Package: "@modelcontextprotocol/server-sqlite"
+        """
+        from mcp_server.application.dtos import BackendRegistrationRequest
+
+        request = BackendRegistrationRequest(
+            source=source,
+            name=name,
+            namespace=namespace,
+            priority=priority,
+            auto_start=auto_start,
+        )
+
+        response = await composition_root.register_backend.execute(request)
+
+        return {
+            "backend_name": response.backend_name,
+            "namespace": response.namespace,
+            "url": response.url,
+            "started": response.started,
+            "message": response.message,
+        }
+
+    @server.tool
+    async def unregister_backend(backend_name: str) -> dict[str, str]:
+        """
+        Unregister an MCP backend server.
+
+        Args:
+            backend_name: Name of backend to remove
+        """
+        await composition_root.unregister_backend.execute(backend_name)
+        return {"message": f"Backend '{backend_name}' unregistered successfully"}
+
+    @server.tool
+    async def reload_backends_config() -> dict[str, Any]:
+        """
+        Reload backend configuration from file.
+
+        Adds new backends, removes deleted ones, and updates changed configurations.
+        """
+        results = await composition_root.reload_backends.execute()
+        return results
+
     logger.info("Registered router management tools")
 
 
@@ -231,3 +306,21 @@ async def _run_health_checker(
     while True:
         await asyncio.sleep(interval)
         await composition_root.check_backend_health.execute()
+
+
+async def _run_process_monitor(composition_root: CompositionRoot, interval: int) -> None:
+    while True:
+        await asyncio.sleep(interval)
+        try:
+            await composition_root.monitor_processes.execute()
+        except Exception as e:
+            logger.error(f"Process monitor error: {e}", exc_info=True)
+
+
+def _register_shutdown_handler(composition_root: CompositionRoot) -> None:
+    import atexit
+
+    def shutdown():
+        asyncio.run(composition_root.shutdown())
+
+    atexit.register(shutdown)
