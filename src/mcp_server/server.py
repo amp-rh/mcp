@@ -1,5 +1,7 @@
 import asyncio
 
+from fastmcp import FastMCP
+
 from mcp_server.config import ServerConfig
 from mcp_server.presentation.server_factory import create_router_server, create_server
 
@@ -13,12 +15,11 @@ def main() -> None:
 
 
 def main_router() -> None:
-    asyncio.run(_run_router())
+    async def _initialize() -> FastMCP:
+        return await create_router_server()
 
-
-async def _run_router() -> None:
-    router = await create_router_server()
-    await router.run()
+    router = asyncio.run(_initialize())
+    router.run()
 
 
 if __name__ == "__main__":
