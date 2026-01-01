@@ -1,18 +1,5 @@
 {
   "mcpServers": {
-    "mcp-server": {
-      "type": "stdio",
-      "command": "uv",
-      "args": [
-        "--directory",
-        "${PROJECT_DIR}",
-        "run",
-        "mcp-server"
-      ],
-      "env": {
-        "MCP_SERVER_NAME": "mcp-server"
-      }
-    },
     "mcp-router": {
       "type": "stdio",
       "command": "uv",
@@ -24,8 +11,7 @@
       ],
       "env": {
         "MCP_BACKENDS_CONFIG": "${PROJECT_DIR}/config/backends.yaml"
-      },
-      "disabled": true
+      }
     }
   }
 }
