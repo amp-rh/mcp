@@ -22,33 +22,113 @@ if ! command -v uv &> /dev/null; then
     exit 1
 fi
 
+# Parse command-line arguments
+MODE=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --mode=*)
+            MODE="${1#*=}"
+            shift
+            ;;
+        --help|-h)
+            echo "Usage: $0 [OPTIONS]"
+            echo
+            echo "Options:"
+            echo "  --mode=template    Install template server (non-interactive)"
+            echo "  --mode=router      Install router server (non-interactive)"
+            echo "  --help, -h         Show this help message"
+            echo
+            echo "If no options are provided, the script runs in interactive mode."
+            exit 0
+            ;;
+        *)
+            echo "❌ Error: Unknown option: $1"
+            echo "   Run '$0 --help' for usage information"
+            exit 1
+            ;;
+    esac
+done
+
 # Install dependencies
 echo "📦 Installing dependencies..."
 uv sync
 echo
 
-# Prompt user for mode selection
-echo "Which mode would you like to install?"
-echo "1) Template Server (standalone, recommended for getting started)"
-echo "2) Router Server (aggregates multiple MCP backends)"
-read -p "Enter choice [1-2]: " mode_choice
+# Determine mode (interactive or non-interactive)
+if [ -z "$MODE" ]; then
+    # Interactive mode
+    echo "Which mode would you like to install?"
+    echo "1) Template Server (standalone, recommended for getting started)"
+    echo "2) Router Server (aggregates multiple MCP backends)"
+    read -p "Enter choice [1-2]: " mode_choice
 
-case $mode_choice in
-    1)
+    case $mode_choice in
+        1)
+            MODE="template"
+            ;;
+        2)
+            MODE="router"
+            ;;
+        *)
+            echo "Invalid choice. Defaulting to template server mode."
+            MODE="template"
+            ;;
+    esac
+else
+    # Non-interactive mode - validate MODE value
+    case $MODE in
+        template|router)
+            echo "Installing in non-interactive mode: $MODE"
+            ;;
+        *)
+            echo "❌ Error: Invalid mode: $MODE"
+            echo "   Valid modes: template, router"
+            exit 1
+            ;;
+    esac
+fi
+
+# Validate backends.yaml for router mode
+if [ "$MODE" = "router" ]; then
+    BACKENDS_FILE="$SCRIPT_DIR/config/backends.yaml"
+
+    if [ ! -f "$BACKENDS_FILE" ]; then
+        echo "❌ Error: backends.yaml not found at $BACKENDS_FILE"
+        echo "   Router mode requires a backends configuration file."
+        echo "   Please create config/backends.yaml or use template mode instead."
+        exit 1
+    fi
+
+    # Check if yq is available for validation
+    if command -v yq &> /dev/null; then
+        backend_count=$(yq '.backends | length' "$BACKENDS_FILE" 2>/dev/null || echo "0")
+        if [ "$backend_count" -eq 0 ]; then
+            echo "❌ Error: No backends configured in config/backends.yaml"
+            echo "   Router mode requires at least one backend server."
+            echo
+            echo "   To fix this:"
+            echo "   1. Edit config/backends.yaml and add backend servers, or"
+            echo "   2. Use template mode instead: $0 --mode=template"
+            exit 1
+        fi
+        echo "✓ Found $backend_count backend(s) configured"
+    else
+        echo "⚠️  Warning: yq not found - skipping backend validation"
+        echo "   Install yq for automatic validation: https://github.com/mikefarah/yq"
+    fi
+fi
+
+# Set server configuration based on mode
+case $MODE in
+    template)
         SERVER_NAME="mcp-server"
         COMMAND="mcp-server"
         echo "Installing template server mode..."
         ;;
-    2)
+    router)
         SERVER_NAME="mcp-router"
         COMMAND="mcp-router"
         echo "Installing router server mode..."
-        echo "⚠️  Note: Router mode requires backend servers configured in config/backends.yaml"
-        ;;
-    *)
-        echo "Invalid choice. Defaulting to template server mode."
-        SERVER_NAME="mcp-server"
-        COMMAND="mcp-server"
         ;;
 esac
 
