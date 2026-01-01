@@ -1,10 +1,10 @@
 from fastmcp import FastMCP
 
-from mcp_server.tools.example_tools import register_example_tools
+from mcp_server.tools.meta import register_meta_tools
 
 
 def register_tools(mcp: FastMCP) -> None:
-    register_example_tools(mcp)
+    register_meta_tools(mcp)
 
 
 __all__ = ["register_tools"]

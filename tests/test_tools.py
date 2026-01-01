@@ -1,16 +1,16 @@
 from fastmcp import FastMCP
 
-from mcp_server.tools.example_tools import register_example_tools
+from mcp_server.tools.meta.testing import register_testing_tools
 
 
 class TestGreetTool:
     def test_greet_returns_greeting(self) -> None:
         mcp = FastMCP("test")
-        register_example_tools(mcp)
+        register_testing_tools(mcp)
 
         greet = None
         for tool in mcp._tool_manager._tools.values():
-            if tool.name == "greet":
+            if tool.name == "meta.testing.greet":
                 greet = tool.fn
                 break
 
@@ -20,11 +20,11 @@ class TestGreetTool:
 
     def test_greet_with_different_name(self) -> None:
         mcp = FastMCP("test")
-        register_example_tools(mcp)
+        register_testing_tools(mcp)
 
         greet = None
         for tool in mcp._tool_manager._tools.values():
-            if tool.name == "greet":
+            if tool.name == "meta.testing.greet":
                 greet = tool.fn
                 break
 
@@ -36,11 +36,11 @@ class TestGreetTool:
 class TestCalculateSumTool:
     def test_calculate_sum_with_numbers(self) -> None:
         mcp = FastMCP("test")
-        register_example_tools(mcp)
+        register_testing_tools(mcp)
 
         calculate_sum = None
         for tool in mcp._tool_manager._tools.values():
-            if tool.name == "calculate_sum":
+            if tool.name == "meta.testing.calculate_sum":
                 calculate_sum = tool.fn
                 break
 
@@ -50,11 +50,11 @@ class TestCalculateSumTool:
 
     def test_calculate_sum_empty_list(self) -> None:
         mcp = FastMCP("test")
-        register_example_tools(mcp)
+        register_testing_tools(mcp)
 
         calculate_sum = None
         for tool in mcp._tool_manager._tools.values():
-            if tool.name == "calculate_sum":
+            if tool.name == "meta.testing.calculate_sum":
                 calculate_sum = tool.fn
                 break
 
@@ -66,11 +66,11 @@ class TestCalculateSumTool:
 class TestReverseStringTool:
     def test_reverse_string(self) -> None:
         mcp = FastMCP("test")
-        register_example_tools(mcp)
+        register_testing_tools(mcp)
 
         reverse_string = None
         for tool in mcp._tool_manager._tools.values():
-            if tool.name == "reverse_string":
+            if tool.name == "meta.testing.reverse_string":
                 reverse_string = tool.fn
                 break
 
@@ -80,11 +80,11 @@ class TestReverseStringTool:
 
     def test_reverse_string_empty(self) -> None:
         mcp = FastMCP("test")
-        register_example_tools(mcp)
+        register_testing_tools(mcp)
 
         reverse_string = None
         for tool in mcp._tool_manager._tools.values():
-            if tool.name == "reverse_string":
+            if tool.name == "meta.testing.reverse_string":
                 reverse_string = tool.fn
                 break
 
