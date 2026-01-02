@@ -1,17 +1,8 @@
 {
   "mcpServers": {
     "mcp-router": {
-      "type": "stdio",
-      "command": "uv",
-      "args": [
-        "--directory",
-        "${PROJECT_DIR}",
-        "run",
-        "mcp-router"
-      ],
-      "env": {
-        "MCP_BACKENDS_CONFIG": "${PROJECT_DIR}/config/backends.yaml"
-      }
+      "type": "http",
+      "url": "http://127.0.0.1:8001/mcp"
     }
   }
 }

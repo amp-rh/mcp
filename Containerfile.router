@@ -1,0 +1,55 @@
+# MCP Router - Production Container with HTTP/SSE Transport
+# Build: podman build -f Containerfile.router -t mcp-router:latest .
+# Run: podman run --rm -p 8001:8001 -v ./config:/app/config:Z mcp-router:latest
+
+FROM registry.access.redhat.com/ubi9/python-311:latest
+
+LABEL name="mcp-router" \
+      version="1.0.0" \
+      description="MCP Router with multi-backend aggregation and HTTP/SSE transport"
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    MCP_SERVER_NAME=mcp-router \
+    MCP_HOST=0.0.0.0 \
+    MCP_PORT=8001 \
+    MCP_BACKENDS_CONFIG=/app/config/backends.yaml \
+    MCP_ENABLE_NAMESPACES=true
+
+# Set working directory
+WORKDIR /app
+
+# Copy dependency files first for better caching
+# Note: curl-minimal is already installed in UBI9 Python image
+COPY --chown=1001:0 pyproject.toml README.md ./
+
+# Install dependencies
+RUN pip install --no-cache-dir .
+
+# Copy source code
+COPY --chown=1001:0 src/ ./src/
+COPY --chown=1001:0 config/ ./config/
+
+# Install the package in editable mode
+RUN pip install --no-cache-dir -e .
+
+# Create config directory with proper permissions
+RUN mkdir -p /app/config && chmod 775 /app/config
+
+# Expose the router HTTP port
+EXPOSE 8001
+
+# Run as non-root user
+USER 1001
+
+# Health check - using HTTP endpoint
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8001/health || exit 1
+
+# Run the MCP router
+# Uses the console script entry point from pyproject.toml
+# FastMCP will automatically use SSE transport when accessed via HTTP
+CMD ["sh", "-c", "mcp-router"]

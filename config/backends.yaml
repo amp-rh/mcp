@@ -3,7 +3,7 @@ backends:
   source: http://127.0.0.1:9000/
   namespace: n8n
   priority: 10
-  auto_start: true
+  auto_start: false  # Disabled due to Issue #8: **kwargs incompatibility
   health_check:
     enabled: true
     interval_seconds: 30

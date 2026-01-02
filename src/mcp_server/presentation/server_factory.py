@@ -90,6 +90,16 @@ async def _register_proxied_tools(
     backends = composition_root.backend_repository.get_all()
 
     for backend in backends:
+        # Skip tool registration for backends with auto_start disabled
+        # This allows backends with incompatible tools (e.g., **kwargs) to be configured
+        # without crashing the router at startup
+        if not backend.config.auto_start:
+            logger.info(
+                f"Skipping tool registration for backend '{backend.config.name}' "
+                f"(auto_start=false)"
+            )
+            continue
+
         for tool_info in backend.tools:
             original_name = tool_info.get("name")
             if not original_name:
@@ -136,6 +146,14 @@ async def _register_proxied_resources(
     backends = composition_root.backend_repository.get_all()
 
     for backend in backends:
+        # Skip resource registration for backends with auto_start disabled
+        if not backend.config.auto_start:
+            logger.info(
+                f"Skipping resource registration for backend '{backend.config.name}' "
+                f"(auto_start=false)"
+            )
+            continue
+
         for resource_info in backend.resources:
             original_uri = resource_info.get("uri")
             if not original_uri:
